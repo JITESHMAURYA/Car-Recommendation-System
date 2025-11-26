@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚗 Car Recommendation System</title>
+
+    <!-- Modern Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ------------------ RESET ---------------------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #eef1f5;
+            min-height: 100vh;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        /* ------------------ HEADER ---------------------- */
+        .header {
+            background: linear-gradient(135deg, rgba(30,60,114,0.9), rgba(42,82,152,0.9)),
+                        url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1600&q=60');
+            background-size: cover;
+            background-position: center;
+            padding: 60px 20px;
+            color: white;
+            text-align: center;
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* ------------------ STATS BAR ---------------------- */
+        .stats-bar {
+            display: flex;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: -30px;
+            background: #fff;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+
+        .stat-card {
+            flex: 1;
+            padding: 28px 20px;
+            text-align: center;
+            border-right: 1px solid #ececec;
+            transition: 0.2s ease;
+        }
+
+        .stat-card:last-child {
+            border-right: none;
+        }
+
+        .stat-card:hover {
+            background: #f8fafc;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1e3c72;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        /* ------------------ MAIN CONTENT ---------------------- */
+        .main-content {
+            margin: 40px 20px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        /* ------------------ TABS ---------------------- */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 18px;
+            text-align: center;
+            font-weight: 500;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        .tab:hover {
+            background: #eef1f5;
+        }
+
+        .tab.active {
+            color: #1e3c72;
+            font-weight: 600;
+            border-bottom: 3px solid #1e3c72;
+            background: #fff;
+        }
+
+        /* ------------------ TAB CONTENT ---------------------- */
+        .tab-content {
+            display: none;
+            padding: 40px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.9rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .tab-content > p {
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        /* ------------------ FORMS ---------------------- */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: 0.2s;
+            background: #f9fafb;
+        }
+
+        input:focus, select:focus {
+            border-color: #1e3c72;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(30,60,114,0.15);
+            outline: none;
+        }
+
+        .btn {
+            background: #1e3c72;
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 10px rgba(30,60,114,0.2);
+        }
+
+        .btn:hover {
+            background: #264a8a;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        /* ------------------ CAR RESULTS ---------------------- */
+        .car-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 20px;
+            transition: 0.2s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .car-card:hover {
+            border-color: #1e3c72;
+            box-shadow: 0 4px 18px rgba(30,60,114,0.15);
+        }
+
+        .car-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .similarity-badge {
+            background: #1e3c72;
+            color: white;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: 12px;
+        }
+
+        .car-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px;
+        }
+
+        .detail-label {
+            color: #6b7280;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        /* ------------------ LOADING ---------------------- */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .spinner {
+            width: 45px;
+            height: 45px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #1e3c72;
+            border-radius: 50%;
+            margin: auto;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ------------------ MOBILE RESPONSIVE ---------------------- */
+        @media (max-width: 786px) {
+            .row { grid-template-columns: 1fr; }
+            .tab-content { padding: 25px; }
+            .header h1 { font-size: 2.2rem; }
+            .stats-bar { flex-direction: column; }
+        }
+    </style>
+</head>
+
+<body>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🚗 Car Recommendation System</h1>
+            <p>Find Your Perfect Car Using Machine Learning</p>
+        </div>
+
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-card">
+                <div class="stat-value" id="totalCars">-</div>
+                <div class="stat-label">Total Cars</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalBrands">-</div>
+                <div class="stat-label">Brands</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgPrice">-</div>
+                <div class="stat-label">Avg Price</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('similar')">Similar Cars</button>
+                <button class="tab" onclick="switchTab('custom')">Custom Specification</button>
+                <button class="tab" onclick="switchTab('popular')">Popular Cars</button>
+            </div>
+
+            <!-- Similar Cars Tab -->
+            <div id="similar" class="tab-content active">
+                <h2>Find Similar Cars</h2>
+                <p>Enter a car name to find similar vehicles based on specifications and features</p>
+                
+                <div class="form-group">
+                    <label for="carName">Car Name</label>
+                    <input type="text" id="carName" placeholder="e.g., Swift, i20, Alto" />
+                </div>
+
+                <div class="form-group">
+                    <label for="numSimilar">Number of Recommendations</label>
+                    <select id="numSimilar">
+                        <option value="5">5 cars</option>
+                        <option value="10">10 cars</option>
+                        <option value="15">15 cars</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="findSimilar()">Find Similar Cars</button>
+
+                <div class="loading" id="loadingSimilar">
+                    <div class="spinner"></div>
+                    <p>Finding similar cars...</p>
+                </div>
+
+                <div id="similarResults" class="results"></div>
+            </div>
+
+            <!-- Custom Specification Tab -->
+            <div id="custom" class="tab-content">
+                <h2>Custom Specification</h2>
+                <p>Configure your preferences to discover cars that match your requirements</p>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="maxPrice">Maximum Price (₹)</label>
+                        <input type="number" id="maxPrice" placeholder="500000" value="500000" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fuelType">Fuel Type</label>
+                        <select id="fuelType">
+                            <option value="">All Types</option>
+                            <option value="Petrol">Petrol</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="CNG">CNG</option>
+                            <option value="Electric">Electric</option>
+                            <option value="LPG">LPG</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="minSeats">Seats</label>
+                        <select id="minSeats">
+                            <option value="">Any</option>
+                            <option value="2">2 Seater</option>
+                            <option value="4">4 Seater</option>
+                            <option value="5" selected>5 Seater</option>
+                            <option value="7">7 Seater</option>
+                            <option value="8">8+ Seater</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="minMileage">Minimum Mileage (km/l)</label>
+                        <input type="number" id="minMileage" placeholder="15" step="0.1" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="minEngine">Minimum Engine (cc)</label>
+                        <input type="number" id="minEngine" placeholder="800" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transmission">Transmission</label>
+                        <select id="transmission">
+                            <option value="">Any</option>
+                            <option value="Manual">Manual</option>
+                            <option value="Automatic">Automatic</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="numCustom">Number of Results</label>
+                    <select id="numCustom">
+                        <option value="5">5 cars</option>
+                        <option value="10" selected>10 cars</option>
+                        <option value="15">15 cars</option>
+                        <option value="20">20 cars</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="findByCustomSpec()">Search Cars</button>
+
+                <div class="loading" id="loadingCustom">
+                    <div class="spinner"></div>
+                    <p>Searching cars...</p>
+                </div>
+
+                <div id="customResults" class="results"></div>
+            </div>
+
+            <!-- Popular Tab -->
+            <div id="popular" class="tab-content">
+                <h2>Popular Cars</h2>
+                <p>Browse the most sought-after vehicles in the market</p>
+
+                <div class="form-group">
+                    <label for="numPopular">Number of Cars</label>
+                    <select id="numPopular">
+                        <option value="5">5 cars</option>
+                        <option value="10">10 cars</option>
+                        <option value="20">20 cars</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="findPopular()">Show Popular Cars</button>
+
+                <div class="loading" id="loadingPopular">
+                    <div class="spinner"></div>
+                    <p>Loading popular cars...</p>
+                </div>
+
+                <div id="popularResults" class="results"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+
+        // Load statistics on page load
+        window.addEventListener('load', loadStats);
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_URL}/stats`);
+                const data = await response.json();
+
+                document.getElementById('totalCars').textContent = data.total_cars.toLocaleString();
+                document.getElementById('totalBrands').textContent = data.brands;
+                document.getElementById('avgPrice').textContent = '₹' + Math.round(data.avg_price / 1000) + 'K';
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        async function findSimilar() {
+            const carName = document.getElementById('carName').value.trim();
+            const n = parseInt(document.getElementById('numSimilar').value);
+
+            if (!carName) {
+                alert('Please enter a car name');
+                return;
+            }
+
+            showLoading('loadingSimilar', true);
+            document.getElementById('similarResults').innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_URL}/recommend/similar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ car_name: carName, n: n })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Car not found');
+                }
+
+                displaySimilarResults(data);
+            } catch (error) {
+                document.getElementById('similarResults').innerHTML = 
+                    `<div class="error">❌ ${error.message}</div>`;
+            } finally {
+                showLoading('loadingSimilar', false);
+            }
+        }
+
+        async function findByCustomSpec() {
+            const maxPrice = parseInt(document.getElementById('maxPrice').value);
+            const fuelType = document.getElementById('fuelType').value;
+            const minSeats = document.getElementById('minSeats').value;
+            const minMileage = document.getElementById('minMileage').value;
+            const minEngine = document.getElementById('minEngine').value;
+            const transmission = document.getElementById('transmission').value;
+            const n = parseInt(document.getElementById('numCustom').value);
+
+            if (!maxPrice) {
+                alert('Please enter maximum price');
+                return;
+            }
+
+            showLoading('loadingCustom', true);
+            document.getElementById('customResults').innerHTML = '';
+
+            try {
+                // Build request body
+                const requestBody = {
+                    max_price: maxPrice,
+                    n: n
+                };
+
+                if (fuelType) requestBody.fuel_type = fuelType;
+                if (minSeats) requestBody.min_seats = parseInt(minSeats);
+                if (minMileage) requestBody.min_mileage = parseFloat(minMileage);
+                if (minEngine) requestBody.min_engine = parseInt(minEngine);
+                if (transmission) requestBody.transmission = transmission;
+
+                const response = await fetch(`${API_URL}/recommend/custom`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
+                displayCustomResults(data.recommendations);
+            } catch (error) {
+                document.getElementById('customResults').innerHTML = 
+                    `<div class="error">❌ Error: ${error.message}</div>`;
+            } finally {
+                showLoading('loadingCustom', false);
+            }
+        }
+
+        async function findPopular() {
+            const n = parseInt(document.getElementById('numPopular').value);
+
+            showLoading('loadingPopular', true);
+            document.getElementById('popularResults').innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_URL}/recommend/popular?n=${n}`);
+                const data = await response.json();
+                displayPopularResults(data.recommendations);
+            } catch (error) {
+                document.getElementById('popularResults').innerHTML = 
+                    `<div class="error">❌ Error: ${error.message}</div>`;
+            } finally {
+                showLoading('loadingPopular', false);
+            }
+        }
+
+        function displaySimilarResults(data) {
+            const resultsDiv = document.getElementById('similarResults');
+            
+            let html = `
+                <div class="selected-car">
+                    <h3>Selected Car</h3>
+                    <div class="car-name">${data.selected.car_name}</div>
+                    <div class="car-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Price</span>
+                            <span class="detail-value">₹${formatPrice(data.selected.selling_price)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Mileage</span>
+                            <span class="detail-value">${data.selected.mileage} km/l</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Fuel Type</span>
+                            <span class="detail-value">${data.selected.fuel_type}</span>
+                        </div>
+                    </div>
+                </div>
+                <h3>Recommended Similar Cars</h3>
+            `;
+
+            data.recommendations.forEach(car => {
+                html += createCarCard(car, true);
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function displayCustomResults(cars) {
+            const resultsDiv = document.getElementById('customResults');
+            
+            if (cars.length === 0) {
+                resultsDiv.innerHTML = '<div class="error">No cars found matching your specifications</div>';
+                return;
+            }
+
+            let html = '<h3>Cars Matching Your Specifications</h3>';
+            cars.forEach(car => {
+                html += createCarCard(car, false);
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function displayPopularResults(cars) {
+            const resultsDiv = document.getElementById('popularResults');
+            
+            let html = '<h3>Most Popular Cars</h3>';
+            cars.forEach(car => {
+                html += createCarCard(car, false);
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function createCarCard(car, showSimilarity) {
+            const similarity = showSimilarity && car.similarity 
+                ? `<span class="similarity-badge">${Math.round(car.similarity * 100)}% Match</span>` 
+                : '';
+
+            return `
+                <div class="car-card">
+                    <div class="car-name">
+                        ${car.car_name}
+                        ${similarity}
+                    </div>
+                    <div class="car-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Price</span>
+                            <span class="detail-value">₹${formatPrice(car.selling_price)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Mileage</span>
+                            <span class="detail-value">${car.mileage} km/l</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Fuel Type</span>
+                            <span class="detail-value">${car.fuel_type}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Vehicle Age</span>
+                            <span class="detail-value">${car.vehicle_age} years</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Brand</span>
+                            <span class="detail-value">${car.brand}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Engine</span>
+                            <span class="detail-value">${car.engine} cc</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function formatPrice(price) {
+            if (price >= 100000) {
+                return (price / 100000).toFixed(1) + 'L';
+            } else if (price >= 1000) {
+                return (price / 1000).toFixed(0) + 'K';
+            }
+            return price.toLocaleString();
+        }
+
+        function showLoading(elementId, show) {
+            document.getElementById(elementId).style.display = show ? 'block' : 'none';
+        }
+    </script>
+    
+</body>
+</html>
